@@ -87,7 +87,7 @@ def unique_BedTool_names(BedTool):
     """
     function that get unique intervall names of given BedTool object. Return a list with unique names.
     """
-    map_name = map(lambda x: x.name, new_tfbs)
+    map_name = map(lambda x: x.name, BedTool)
     names = np.array(list(map_name))
     names_unique = np.unique(names)
     return list(names_unique)
@@ -116,22 +116,57 @@ def main():
     """
     Step 1: Filtering the genomic location by a second BED File, which contains the important Regions (e.g. Promotor regions etc.)
     """
+    print("\n Running Script ...\n")
     reduced_data = reduce_bed_by_intersect_wa(bed_file_path=args.filename, intersect_file_path=args.intersect)
+    print("Step 1 successfully completed. Only UniBind TFBS which intersect with Genomic Regions of -fb BED file remain.\n")
+
+    # Optional save:
+    if args.all_output:
+        reduced_data.saveas(f"{args.output}/reduced_data.bed")
+        print("--- reduced_data.bed generated")
 
     """
     Step 2: (Optional) Filtering the genomic location based on the chromosomes. (default= chr1-22 and X,Y)
     """
-    
+    # if no -c argument is used --> default = ""
+    if args.chromosome_list == "":
+        print("No filtering by chromosomes ...\n")
+        filtered_data = reduced_data
+        print("Step 2 successfully completed.\n")
+    # if -c argument is used. If -c "default" is given, chr1-22 and chrX and chrY will be filtered. Otherwise the -c argument need to be a list with suitable chromosome names.  
+    else:
+        print("... Filtering by chromosomes ...\n")
+        if args.chromosome_list == "deault":
+            filtered_data = filtering_chromosomes(reduced_data)
+            print("Step 2 successfully completed. Only chr1-22 and chrX and chrY remain ...\n")
+        else:
+            filtered_data = filtering_chromosomes(reduced_data, args.chromosome_list)
+            print(f"Step 2 successfully completed. Only {args.chromosome_list} remain ...\n")
+
+
+     # Optional save:
+    if args.all_output:
+        filtered_data.saveas(f"{args.output}/filtered_data.bed")
+        print("--- filtered_data generated.\n")
 
 
     """
     Step 3: Refining the Data and changing columns: Information from "name" column will be extracted and they'll replace the unnecesarry columns.
             (If possible with .each(func) and not with Dataframe. In case the Bedfile will be too big for beeing saved in a DataFrame.)
     """
+    refined_data = refine_BedTool(filtered_data)
+
+     # Optional save:
+    if args.all_output:
+        refined_data.saveas(f"{args.output}/refined_data.bed")
+        print("--- refined_data generated.\n")
 
     """
     Step 4: Merge repetitive Entrys
     """
+    merged_data = merge_bed_considering_name(refined_data).saveas(f"{args.output}/output_data.bed")
+    print("--- output_data.bed generated.\n")
+    print("... Script complete.\n")
 
 
 
@@ -145,7 +180,7 @@ if __name__ == "__main__":
                     STEP 2: (Optional) Filtering the genomic location based on the chromosomes. (default= chr1-22 and X,Y)
                     STEP 3: Refining the Data and changing columns: Information from "name" column will be extracted and they'll replace the unnecesarry columns.
                     STEP 4: Merge repetitive Entrys and save into a new BED file)
-                    """   
+                    """   )
     # Required
     # Input and Output of the files:
     parser.add_argument('-f', '--filename', required=True,
@@ -153,15 +188,13 @@ if __name__ == "__main__":
     parser.add_argument('-fb', '--intersect', required=True,
             help='give BED file for intersection')
     parser.add_argument('-out', '--output', required=True,
-            help='give output path for new BED file')
+            help='give output path for folder where new BED file(s) were saved.')
     # Optional
-    parser.add_argument('-c', '--chromosome_list', required=False, default=["chr1", "chr2", "chr3", "chr4","chr5","chr6","chr7","chr8", "chr9","chr10","chr11","chr12","chr13","chr14","chr15","chr16","chr17","chr18","chr19", "chr20","chr21","chr22","chrX","chrY"],
-                        action = "store_false",
-            help='give list with chromosomes. They have to match with BedTool.chrom entrys. By default chr1-22 and chrX and Y are used.')   
-    parser.add_argument('-all', '--all_output', required=False, default=False,
+    parser.add_argument('-c', '--chromosome_list', required=False, default="",
+            help='give list with chromosomes. They have to match with BedTool.chrom entrys. If you Type  "default", chr1-22 and chrX and Y are used.')   
+    parser.add_argument('-all', '--all_output', required=False, action="store_true",
             help='give True, default = False. Also saves files during the process as BED file.')
 
     args = parser.parse_args()
-
-    print(args.chromosome_list)
     
+    main()
