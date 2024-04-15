@@ -117,7 +117,7 @@ def main():
     Step 1: Filtering the genomic location by a second BED File, which contains the important Regions (e.g. Promotor regions etc.)
     """
     print("\n Running Script ...\n")
-    reduced_data = reduce_bed_by_intersect_wa(bed_file_path=args.filename, intersect_file_path=args.intersect)
+    reduced_data = reduce_bed_by_intersect_wa(bed_file_path=args.filename, intersect_file_path=args.intersect).saveas()
     print("Step 1 successfully completed. Only UniBind TFBS which intersect with Genomic Regions of -fb BED file remain.\n")
 
     # Optional save:
@@ -132,29 +132,28 @@ def main():
     if args.chromosome_list == "":
         print("No filtering by chromosomes ...\n")
         filtered_data = reduced_data
-        print("Step 2 successfully completed.\n")
+        print("Step 2 skipped\n")
     # if -c argument is used. If -c "default" is given, chr1-22 and chrX and chrY will be filtered. Otherwise the -c argument need to be a list with suitable chromosome names.  
     else:
         print("... Filtering by chromosomes ...\n")
         if args.chromosome_list == "deault":
-            filtered_data = filtering_chromosomes(reduced_data)
+            filtered_data = filtering_chromosomes(reduced_data).saveas()
             print("Step 2 successfully completed. Only chr1-22 and chrX and chrY remain ...\n")
         else:
-            filtered_data = filtering_chromosomes(reduced_data, args.chromosome_list)
+            filtered_data = filtering_chromosomes(reduced_data, args.chromosome_list).saveas()
             print(f"Step 2 successfully completed. Only {args.chromosome_list} remain ...\n")
 
-
-     # Optional save:
-    if args.all_output:
-        filtered_data.saveas(f"{args.output}/filtered_data.bed")
-        print("--- filtered_data generated.\n")
+        # Optional save:
+        if args.all_output:
+            filtered_data.saveas(f"{args.output}/filtered_data.bed")
+            print("--- filtered_data generated.\n")
 
 
     """
     Step 3: Refining the Data and changing columns: Information from "name" column will be extracted and they'll replace the unnecesarry columns.
             (If possible with .each(func) and not with Dataframe. In case the Bedfile will be too big for beeing saved in a DataFrame.)
     """
-    refined_data = refine_BedTool(filtered_data)
+    refined_data = refine_BedTool(filtered_data).saveas()
 
      # Optional save:
     if args.all_output:
@@ -165,8 +164,10 @@ def main():
     Step 4: Merge repetitive Entrys
     """
     merged_data = merge_bed_considering_name(refined_data).saveas(f"{args.output}/output_data.bed")
+
     print("--- output_data.bed generated.\n")
     print("... Script complete.\n")
+
 
 
 
