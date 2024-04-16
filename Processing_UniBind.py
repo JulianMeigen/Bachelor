@@ -118,7 +118,7 @@ def main():
     """
     print("\n Running Script ...\n")
     reduced_data = reduce_bed_by_intersect_wa(bed_file_path=args.filename, intersect_file_path=args.intersect).saveas()
-    print("Step 1 successfully completed. Only UniBind TFBS which intersect with Genomic Regions of -fb BED file remain.\n")
+    print("Step 1 successfully completed. Only UniBind TFBS which intersect with Genomic Regions of -fb BED file remain. \n")
 
     # Optional save:
     if args.all_output:
@@ -130,9 +130,9 @@ def main():
     """
     # if no -c argument is used --> default = ""
     if args.chromosome_list == "":
-        print("No filtering by chromosomes ...\n")
+        print("Step 2 skipped. No filtering by chromosomes ...\n")
         filtered_data = reduced_data
-        print("Step 2 skipped\n")
+
     # if -c argument is used. If -c "default" is given, chr1-22 and chrX and chrY will be filtered. Otherwise the -c argument need to be a list with suitable chromosome names.  
     else:
         print("... Filtering by chromosomes ...\n")
@@ -153,8 +153,10 @@ def main():
     Step 3: Refining the Data and changing columns: Information from "name" column will be extracted and they'll replace the unnecesarry columns.
             (If possible with .each(func) and not with Dataframe. In case the Bedfile will be too big for beeing saved in a DataFrame.)
     """
+    print("... Refining the Data and changing the columns ...\n")
     refined_data = refine_BedTool(filtered_data).saveas()
-
+    print("Step 3 successfully completed. ”ChipSeq-ID_Tissue_TF-name_JASPAR-ID” information retrieved.\n")
+    print("Column 3 = TF-name, Column 6 = ChipSeq-ID, Column 7 = Tissue, Column 8 = JASPAR-ID \n")
      # Optional save:
     if args.all_output:
         refined_data.saveas(f"{args.output}/refined_data.bed")
@@ -163,12 +165,11 @@ def main():
     """
     Step 4: Merge repetitive Entrys
     """
+    print("... Merging repetitive Entrys ...")
     merged_data = merge_bed_considering_name(refined_data).saveas(f"{args.output}/output_data.bed")
 
     print("--- output_data.bed generated.\n")
-    print("... Script complete.\n")
-
-
+    print("Script complete.\n")
 
 
 
