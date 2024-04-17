@@ -16,7 +16,6 @@ def reduce_bed_by_intersect_wa(bed_file_path, intersect_file_path, output_path):
 
 
 
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
                     prog = 'Reduce BED file to common chromosomes',
