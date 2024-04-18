@@ -149,13 +149,13 @@ def main():
     # If GTEx file is used
     if args.gtex_as_input_file:
          # changing gene_ID to 3rd column (only in gtex necessary)
-        new_intersect = intersect.each(refine_GTEx_intervall, prom_len)
+        new_intersect = intersect.each(refine_GTEx_intervall, prom_len).saveas(f"{args.output}/new_intersect.bed")
         c_for_merge = [4,5,6, 7,8,9,10, 11,12]
         o_for_merge = ["distinct","distinct","distinct", "collapse","collapse","collapse","collapse", "distinct","distinct"]
-        merged_BedTool = merge_bed_considering_field(new_intersect, 10, c_for_merge, o_for_merge)
+        merged_BedTool = merge_bed_considering_field(new_intersect, 11, c_for_merge, o_for_merge)
     
     else:
-        new_intersect = intersect.each(refine_intersect_intervall, prom_len)
+        new_intersect = intersect.each(refine_intersect_intervall, prom_len).saveas(f"{args.output}/new_intersect.bed")
         c_for_merge = [4,5,6, 7,8,9,10]
         o_for_merge = ["distinct","distinct","distinct", "collapse","collapse","collapse","collapse"]
         merged_BedTool = merge_bed(new_intersect, c_for_merge, o_for_merge)
