@@ -71,21 +71,37 @@ def merge_bed(BedTool, c_for_merge, o_for_merge):
 
 
 
-def generate_input_for_merge(prom, c_tfbs, c_prom, o_tfbs, o_prom):
-    """
-    Generating c_for_merge and o_for_merge by considering the input columns for the tfbs BED file and the prom BED file.
-    First, the length of the promotor BED is considered to change the column index of the tfbs file to the new index position in the intersected file.
-    Second the prom lists will be appended by the tfbs lists 
-    """
-    # Changing TFBS columns to new intersect columns
-    prom_field_len = len(prom[0].fields)
-    c_tfbs_new = [ci + prom_field_len for ci in c_tfbs]
+# def generate_input_for_merge(prom, c_tfbs, c_prom, o_tfbs, o_prom):
+#     """
+#     Generating c_for_merge and o_for_merge by considering the input columns for the tfbs BED file and the prom BED file.
+#     First, the length of the promotor BED is considered to change the column index of the tfbs file to the new index position in the intersected file.
+#     Second the prom lists will be appended by the tfbs lists 
+#     """
+#     # Changing TFBS columns to new intersect columns
+#     prom_field_len = len(prom[0].fields)
+#     c_tfbs_new = [ci + prom_field_len for ci in c_tfbs]
 
-    c_for_merge = c_prom + c_tfbs_new
-    o_for_merge = o_prom + o_tfbs
-    return c_for_merge, o_for_merge
+#     c_for_merge = c_prom + c_tfbs_new
+#     o_for_merge = o_prom + o_tfbs
+#     return c_for_merge, o_for_merge
 
 
+def refine_GTEx_intervall(interval, prom_len, gen_id_idx=6):
+
+    # changing gene_ID to 3rd column (only in gtex necessary)
+    interval[gen_id_idx], interval[3] = interval[3], interval[gen_id_idx]
+    interval[7], interval[10] = interval[10], interval[7]
+    exp = interval[9]
+    # changing tfbs to 6th
+    interval[prom_len+3], interval[6] = interval[6], interval[prom_len+3]
+    # changing tfbs start and stop and strand to 7th, 8th, 9th
+    interval[prom_len+1], interval[7] = interval[7], interval[prom_len+1]
+    interval[prom_len+2], interval[8] = interval[8], interval[prom_len+2]
+    interval[prom_len+5], interval[9] = interval[9], interval[prom_len+5]
+
+    interval[11] = exp
+
+    return interval  
 
 def refine_intersect_intervall(interval, prom_len):
     """
@@ -109,7 +125,7 @@ def refine_intersect_intervall(interval, prom_len):
         close =  TSS - int(interval[8])
         dist = TSS - int(interval[7])
     else:
-        print("Genehas no strand")
+        print("Gene has no strand")
     interval[7] = close
     interval[8] = dist
 
@@ -126,35 +142,25 @@ def main():
 
     # Intersect
     intersect= prom.intersect(tfbs_all, wa=True, wb=True).sort()
+    prom_len = len(prom[0].fields)
 
     # Change the columns in intersected file
 
-    
-
     # If GTEx file is used
     if args.gtex_as_input_file:
-        c_for_merge=[4,5,6,7,8,9,10,  14,12,13,16, 18, 14, 14]
-        o_for_merge=["distinct","distinct","distinct","distinct","distinct","distinct","distinct",  "collapse","collapse","collapse","collapse", "distinct", "count", "count_distinct"]
-        merged_BedTool = merge_bed_considering_field(intersect,7, c_for_merge, o_for_merge)
+         # changing gene_ID to 3rd column (only in gtex necessary)
+        new_intersect = intersect.each(refine_GTEx_intervall, prom_len)
+        c_for_merge = [4,5,6, 7,8,9,10, 11,12]
+        o_for_merge = ["distinct","distinct","distinct", "collapse","collapse","collapse","collapse", "distinct","distinct"]
+        merged_BedTool = merge_bed_considering_field(new_intersect, 10, c_for_merge, o_for_merge)
     
-    # Default
     else:
-        c_for_merge, o_for_merge = generate_input_for_merge(prom, args.column_in_tfbs, args.column_in_prom, args.operation_for_tfbs, args.operation_for_prom)
+        new_intersect = intersect.each(refine_intersect_intervall, prom_len)
+        c_for_merge = [4,5,6, 7,8,9,10]
+        o_for_merge = ["distinct","distinct","distinct", "collapse","collapse","collapse","collapse"]
+        merged_BedTool = merge_bed(new_intersect, c_for_merge, o_for_merge)
 
-        # Considering a column in the Promotor file to merge only Promotors with same content.
-        if args.consider_field_in_prom != 0:
-            merged_BedTool = merge_bed_considering_field(BedTool=intersect, field_number=args.consider_field_in_prom, c_for_merge=c_for_merge, o_for_merge=o_for_merge)
-
-        else:
-            merged_BedTool = merge_bed(BedTool=intersect, c_for_merge=c_for_merge, o_for_merge=o_for_merge)
-
-    # Saving the intermediate BED Tool
     merged_BedTool.saveas(f"{args.output}/Prom_with_TFBSs_raw.bed")
-    
-
-
-
-
 
 
 
@@ -178,22 +184,8 @@ if __name__ == "__main__":
             help='If -gtex, then the -fb file will be considered as GTEx File and the input (see below) is not necessary to process it correctly.')  
 
     # Define if it should be merged by a specific column in Prom BED file
-    parser.add_argument('-consider_field', '--consider_field_in_prom', required=False, default=0,
-                help='Specify columns from the input prom file, where the content must be the same for the promoter to be merged. Caution: RunTime, The unique values in the column may not be too many. By default (0), no column will be considerd. ')
-
-    # Input for specific columns and operation for input files, during merging.
-    parser.add_argument('-c_tfbs', '--column_in_tfbs', required=False, default=[4, 2, 3, 6],
-            help='Specify columns from the input tfbs file to operate upon (see -o_tfbs option, below). (1-based) Multiple columns can be specified in a comma-delimited list. (see bedtool merge arguments)')   
-    parser.add_argument('-o_tfbs', '--operation_for_tfbs', required=False, default=["collapse","collapse","collapse","collapse"],
-            help='Specify the operation that should be applied to -c. Multiple operations can be specified in a comma-delimited list. (see bedtool merge arguments)')
-    
-    parser.add_argument('-c_prom', '--column_in_prom', required=False, default=[4, 5, 6],
-            help='Specify columns from the input prom file to operate upon (see -o_prom option, below). (1-based) Multiple columns can be specified in a comma-delimited list. (see bedtool merge arguments)')   
-    parser.add_argument('-o_prom', '--operation_for_prom', required=False, default=["distinct", "distinct", "distinct"],
-            help='Specify the operation that should be applied to -c_prom. Multiple operations can be specified in a comma-delimited list. (see bedtool merge arguments)')
-    
-
-
+    # parser.add_argument('-consider_field', '--consider_field_in_prom', required=False, default=0,
+    #             help='Specify columns from the input prom file, where the content must be the same for the promoter to be merged. Caution: RunTime, The unique values in the column may not be too many. By default (0), no column will be considerd. ')
     
     args = parser.parse_args()
     
