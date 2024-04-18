@@ -19,9 +19,14 @@ Step 3: Refining the Data and changing columns: Information from "name" column w
 
 Step 4: Merge repetitive Entrys
 
+In the End the Data should look like this:
+chr1	17510	17522	MYCN	0	-	EXP038397	NGP--neuroblastoma-	MA0104.4	1
+chr1	629638	629650	OTX2	0	-	EXP036801	HUES64--embryonic-stem-cells-	MA0712.2	1
+chr1	634195	634206	EGR2	0	+	EXP039511	HEK293--embryonic-kidney-	MA0472.2	1
+chr1	758332	758348	JUN	0	-	EXP038043	HAEC--human-aortic-endothelial-cells-	MA0462.2,MA0488.1,MA0489.1,MA1127.1,MA1128.1,MA1132.1	6
+chr1	758332	758344	JUN	0	+	EXP038043	HAEC--human-aortic-endothelial-cells-	MA0099.3,MA1130.1	2
 
 """
-
 
 import pybedtools
 import numpy as np
