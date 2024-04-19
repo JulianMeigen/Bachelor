@@ -181,7 +181,7 @@ if __name__ == "__main__":
     # Optional
     # Define if known GTEx file
     parser.add_argument('-gtex', '--gtex_as_input_file', required=False, action="store_true",
-            help='If -gtex, then the -fb file will be considered as GTEx File and the input (see below) is not necessary to process it correctly.')  
+            help='If -gtex, then the -fb file will be considered as GTEx File and the input it will process it slightly different.')  
 
     # Define if it should be merged by a specific column in Prom BED file
     # parser.add_argument('-consider_field', '--consider_field_in_prom', required=False, default=0,
