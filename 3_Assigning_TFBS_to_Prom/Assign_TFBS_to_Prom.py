@@ -56,7 +56,7 @@ def merge_bed_considering_field(BedTool, field_number, c_for_merge, o_for_merge)
     
     merged_tfbs_tmp = pybedtools.BedTool(())
     for tfbs_name in BedTool_name_unique:
-        single_tfbs_merged = BedTool.filter(lambda x: x.fields[7] == tfbs_name).merge(s=True, c=c_for_merge, o=o_for_merge)
+        single_tfbs_merged = BedTool.filter(lambda x: x.fields[field_number] == tfbs_name).merge(s=True, c=c_for_merge, o=o_for_merge).saveas()
         merged_tfbs_tmp = merged_tfbs_tmp.cat(single_tfbs_merged, postmerge=False)
     
     merged_tfbs = merged_tfbs_tmp.sort()
@@ -152,7 +152,7 @@ def main():
         new_intersect = intersect.each(refine_GTEx_intervall, prom_len).saveas(f"{args.output}/new_intersect.bed")
         c_for_merge = [4,5,6, 7,8,9,10, 11,12]
         o_for_merge = ["distinct","distinct","distinct", "collapse","collapse","collapse","collapse", "distinct","distinct"]
-        merged_BedTool = merge_bed_considering_field(new_intersect, 11, c_for_merge, o_for_merge)
+        merged_BedTool = merge_bed_considering_field(new_intersect, 10, c_for_merge, o_for_merge)
     
     else:
         new_intersect = intersect.each(refine_intersect_intervall, prom_len).saveas(f"{args.output}/new_intersect.bed")
