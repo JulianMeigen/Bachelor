@@ -101,6 +101,19 @@ def refine_GTEx_intervall(interval, prom_len, gen_id_idx=6):
 
     interval[11] = exp
 
+    if interval.strand == "-":
+        TSS = interval.start
+        close = int(interval[7]) - TSS
+        dist = int(interval[8]) - TSS
+    elif interval.strand == "+":
+        TSS = interval.end
+        close =  TSS - int(interval[8])
+        dist = TSS - int(interval[7])
+    else:
+        print("Gene has no strand")
+    interval[7] = close
+    interval[8] = dist
+
     return interval  
 
 def refine_intersect_intervall(interval, prom_len):
@@ -138,7 +151,7 @@ def refine_intersect_intervall(interval, prom_len):
 def main():
     # Input files
     tfbs_all = pybedtools.BedTool(args.tfbs_file)
-    prom = pybedtools.BedTool(args.intersect_file)
+    prom = pybedtools.BedTool(args.prom_file)
 
     # Intersect
     intersect= prom.intersect(tfbs_all, wa=True, wb=True).sort()
@@ -167,14 +180,14 @@ def main():
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
                     prog = 'This Script assigns all TFBS in a BED file to genomic locations of another BED file. Specific conditions for merging can be specified.',
-                    description = """All TFBS in first file will be intersected with region in second file. The regions will be merged under user-defined conditions. 
-                     By default specific columns of the tfbs and promotor remain intact. """   )
+                    description = """All TFBS in TFBS file will be intersected with region in prom file. The regions will be merged. If its a gtex file, more columns remain. 
+                     By default specific columns of the tfbs and promotor remain intact, but they'll occur in changed order. """   )
     # Required
     # Input and Output of the files:
-    parser.add_argument('-f', '--tfbs_file', required=True,
-            help='give TFBS BED file path')
-    parser.add_argument('-fb', '--intersect_file', required=True,
-            help='give BED file for intersection. Containing genomic regions e.g. promotors')
+    parser.add_argument('-f', '--prom_file', required=True,
+            help='give BED file path containing genomic regions e.g. promotors.')
+    parser.add_argument('-tfbs', '--tfbs_file', required=True,
+            help='give TFBS BED file.')
     parser.add_argument('-out', '--output', required=True,
             help='give output path')
     
