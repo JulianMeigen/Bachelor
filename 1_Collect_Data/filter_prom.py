@@ -9,7 +9,7 @@ def filter_bed(BedTool, column_number, filter_content):
     """
     Function that filters a bed file by a specific content in a specific column.
     """
-    filtered_BedTool = BedTool.filter(lambda x: x.fields[column_number] == filter_content).saveas()
+    filtered_BedTool = BedTool.filter(lambda x: x.fields[column_number] == filter_content)
     return filtered_BedTool
 
     
