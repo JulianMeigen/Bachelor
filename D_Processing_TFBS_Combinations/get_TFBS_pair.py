@@ -49,7 +49,11 @@ def func_for_tfbs_subset(BedTool_Interval, tfbs_lst):
     else:
         return False
     
-
+def get_tfbs_subset(BedTool, tfbs_lst):
+    """
+    Filtering BedTool, so that only Promotors/GeneIDs remain, that contain every TFBS in tfbs_lst at least once.
+    """
+    return BedTool.filter(func_for_tfbs_subset, tfbs_lst)
 
 def Check_if_input_in_BedTool_column(BedTool, column_number, input):
     # Creating an array with unique entrys of BedTool column
@@ -286,16 +290,9 @@ def get_pair(BedTool, tfbs_lst, filter_by_geneType="", filter_by_chr=""):
 
     # Step 4: Filtering the Promotor/GeneIDs, which contain multiple TFBS of the same TF.
     tfbs_pair_hetero, tfbs_pair_homo = filter_homotypic(tfbs_pair_df, tfbs_lst, get_homotypic=True)
-    print(f"Note: {len(tfbs_pair_homo)}/{len(tfbs_pair_hetero)+len(tfbs_pair_homo)} TFBS were removed because they or their partner appeared several times in the promoter region. {len(tfbs_pair_hetero)} TFBS remain.")
+    print(f"Note: {len(tfbs_pair_homo)}/{len(tfbs_pair_hetero)+len(tfbs_pair_homo)} TFBS were removed because one of the TFBS from the TFBS pair appeared several times in the promoter region. {len(tfbs_pair_hetero)} TFBS remain.")
     
     # Step 5: Generating DataFrame, which contains important information about Order, Orientaion and TSS-Distance of TFBS-pair.
     tfbs_pair_ord_ori_df = get_orientation_and_order_for_pair(tfbs_pair_hetero)
 
     return  tfbs_pair_ord_ori_df
-
-
-
-data = pybedtools.BedTool("/sybig/projects/GeneRegulation/data/jme/Bachelorarbeit/data/Promotor_with_TFBS/All_GTEx_Prom_with_TFBS.bed")
-tfbs_lst = ["SMAD3", "ATF2"]
-df_pair = get_pair(data, tfbs_lst)
-print(df_pair.head())
