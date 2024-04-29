@@ -7,6 +7,7 @@ import pybedtools
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import argparse
 
 
 def func_for_tfbs_subset(BedTool_Interval, tfbs_lst):
@@ -296,3 +297,31 @@ def get_pair(BedTool, tfbs_lst, filter_by_geneType="", filter_by_chr=""):
     tfbs_pair_ord_ori_df = get_orientation_and_order_for_pair(tfbs_pair_hetero)
 
     return  tfbs_pair_ord_ori_df
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+                    prog = 'This Script returns a csv file with all important informations about a given TFBS pair.',
+                    description = """The input BedFile will be filtered for the tfbs pair subset. Each Promotor/GenID containing multiple copies of one od the TFBS will be filtered.
+                     A csv file will be generated, containing all important informations about that tfbs pair and can be used for further processing. """   )
+    # Required
+    # Input and Output of the files:
+    parser.add_argument('-f', '--filename', required=True,
+            help='give BED file path containing genomic regions of Promotors, the GeneID, all TFBS etc. It has to be in the right format (see Documentation)')
+    parser.add_argument('-tfbs_pair', '--tfbs_pair_list', nargs="*", type=str, required=True,
+            help='give a list, containing two TFBS names, which should be processed as tfbs pair.')
+    parser.add_argument('-out', '--output', required=True,
+            help='give output path for csv file')
+    
+    # Optional
+    # Specify GeneType or chromosome for filtering
+    parser.add_argument('-geneType', '--filter_GeneType', required=False, default="",
+            help='Specify GeneType for filtering given BedTool. ')  
+    parser.add_argument('-chr', '--filter_chromosome', required=False, default="",
+            help='Specify chromosome for filtering given BedTool. ') 
+    
+    args = parser.parse_args()
+    
+    data = pybedtools.BedTool(args.filename)
+    tfbs_pair = [args.tfbs_one, args.tfbs_two]
+    df = get_pair(data, args.tfbs_pair, filter_by_geneType="", filter_by_chr="")
