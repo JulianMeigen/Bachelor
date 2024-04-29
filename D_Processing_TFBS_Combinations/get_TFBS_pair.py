@@ -323,5 +323,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     data = pybedtools.BedTool(args.filename)
-    tfbs_pair = [args.tfbs_one, args.tfbs_two]
-    df = get_pair(data, args.tfbs_pair, filter_by_geneType="", filter_by_chr="")
+    tfbs_lst = args.tfbs_pair
+    df = get_pair(data, tfbs_lst, filter_by_geneType=args.filter_GeneType, filter_by_chr=args.filter_chromosome)
+    df.to_csv(f"{args.output}/{tfbs_lst[0]}_{tfbs_lst[1]}.csv")
