@@ -163,8 +163,6 @@ def plot_bar_Frequency_for_TFBS(count_tfbs, nT_percent, tfbs_name, output_folder
 
 
 
-
-
 def get_count_of_all_tfbs(data, tfbs_lst, return_single_plots = False, output_folder=""):
     
     count_all = []
@@ -191,6 +189,50 @@ def get_count_of_all_tfbs(data, tfbs_lst, return_single_plots = False, output_fo
     return count_all, nT_pct_all, count_freq_all
 
 
+
+def plot_count_for_TFBSs(tfbs_lst, count_all, nT_pct_all, output_folder):
+
+    df = pd.DataFrame({"TF": tfbs_lst, "TFBS_count":count_all, "nT_ratio":nT_pct_all})
+    df = df.sort_values(by="TFBS_count", ascending=False)
+
+    x = df["TF"].to_numpy()
+    y1_T = df["TFBS_count"].to_numpy()
+    y2_nT = df["nT_ratio"].to_numpy() * y1_T
+
+    nT_percent_all = np.sum(nT_pct_all)/len(nT_pct_all)
+    T_percent_all = np.abs(1-nT_percent_all)
+    
+
+    fig, ax = plt.subplots(figsize=(10,45))
+
+    ax.barh(x, y1_T, label=f"Template Strand: {round(T_percent_all*100, 2)}%", align='center')
+    ax.barh(x, y2_nT, label=f"Non-Template Strand: {round(nT_percent_all*100, 2)}%", align='center')
+    ax.invert_yaxis()
+    ax.set_yticks(np.arange(len(x)), x)
+    ax.set_xlabel("TFBSs")
+    ax.set_ylabel("Frequency")
+    ax.legend(loc="lower right")
+    ax.grid()
+    plt.title("Frequency of all TFBS in Promotor Regions")
+    
+
+    fig.savefig(f"{output_folder}/Barplot_all_TFBS.png")
+
+def plot_pie_for_count_freq(count_freq_all, output_folder):
+    freq, count = np.unique(count_freq_all, return_counts=True)
+    series = pd.Series(index=freq, data=count)
+
+    relevant = series[:3]
+    other = series[4:].sum()
+    relevant[">3"] = other
+
+
+    fig = plt.figure()
+    relevant.plot.pie(figsize=(6,6), subplots=True, explode=[0.1, 0., 0., 0.], shadow = True, startangle=180, autopct='%1.1f%%',  pctdistance=0.8, labeldistance=1.1, ylabel="")
+    plt.title("Frequency of the same TFBS in a region.")
+    plt.legend()
+    #plt.xticks(np.arange(2), ["homotypic", "hetortypic"])
+    fig.savefig(f"{output_folder}/Pie_TFBS_count_per_Promotor.png")
 
 
 
