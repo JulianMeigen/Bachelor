@@ -9,6 +9,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import argparse
 
+from timebudget import timebudget
+
+
 
 def func_for_tfbs_subset(BedTool_Interval, tfbs_lst):
     """
@@ -49,7 +52,7 @@ def func_for_tfbs_subset(BedTool_Interval, tfbs_lst):
         
     else:
         return False
-    
+ 
 def get_tfbs_subset(BedTool, tfbs_lst):
     """
     Filtering BedTool, so that only Promotors/GeneIDs remain, that contain every TFBS in tfbs_lst at least once.
@@ -86,7 +89,6 @@ def filter_bed(BedTool, column_number, filter_content):
 
 
 
-
 def get_information_for_singel_tfbs_set(BedTool_Interval):
     """
     Function that is splitting the infomration about the TFBS, such as TSS-distance and strand oriantation and saving it in diffrent numpy arrays.
@@ -113,7 +115,7 @@ def get_information_for_singel_tfbs_set(BedTool_Interval):
     return chr, geneID, tfbs_arr, tfbs_close_tss_arr, tfbs_dist_tss_arr, tfbs_strand_orientation, tfbs_count, tfbs_unique_count
 
 
-
+@timebudget
 def expand_tfbs_information_to_df(BedTool):
     """
     Function that iterates over all BedTool-Intervals and extracting inforations about TFBS by using the get_information_for_singel_tfbs_set function.
@@ -179,7 +181,7 @@ def filter_homotypic(df, tfbs_lst, get_homotypic=False):
     return filtered_df
     
 
-
+@timebudget
 def get_orientation_for_pair(pair_df_sorted):
     """
     Function which is used in get_orientation_and_order_for_pair.
@@ -203,7 +205,7 @@ def get_orientation_for_pair(pair_df_sorted):
 
 
 
-
+@timebudget
 def get_orientation_and_order_for_pair(df):
     """
      Function that gets an DataFrame as input, which should only contain two entrys per Promotor/GeneID, because it will only consider the first two rows.
@@ -269,7 +271,7 @@ def get_orientation_and_order_for_pair(df):
 
 
 
-
+@timebudget
 def get_pair(BedTool, tfbs_lst, filter_by_geneType="", filter_by_chr=""):
     """
     Function that combines the previous functions to get the DataFrame for a Pair.
@@ -299,6 +301,50 @@ def get_pair(BedTool, tfbs_lst, filter_by_geneType="", filter_by_chr=""):
     return  tfbs_pair_ord_ori_df
 
 
+def get_possible_pairs(all_tfbs):
+    all_tfbs.sort()
+    pairs_as_tuple = [(a, b) for idx, a in enumerate(all_tfbs) for b in all_tfbs[idx + 1:]]
+    return pairs_as_tuple
+
+
+def get_csv_single_pair(data, tfbs_pair):
+    df = get_pair(data, tfbs_pair, filter_by_geneType=args.filter_GeneType, filter_by_chr=args.filter_chromosome)
+    df.to_csv(f"{args.output}/{tfbs_pair[0]}_{tfbs_pair[1]}.csv", index=False)
+    return df
+
+def main():
+    data = pybedtools.BedTool(args.filename)
+
+    # Set tfbs_lst to UniBind TFBS if -return_uniBind is specified.
+    if args.return_all_uniBind_tfbs_pairs:
+        tfbs_lst = ['AR', 'ARNT', 'ARNTL', 'ASCL1', 'ATF2', 'ATF3', 'ATF4', 'ATF7', 'BACH1', 'BACH2', 'BATF', 'BATF3', 'BCL6', 'BCL6B', 'BHLHE22', 'BHLHE40', 'CDX2', 'CEBPA', 'CEBPB', 'CEBPD', 'CEBPG', 'CLOCK', 'CREB1', 'CREM', 'CTCF', 'CTCFL', 'CUX1', 'DUX4', 'E2F1', 'E2F4', 'E2F6', 'E2F7', 'E2F8', 'EBF1', 'EBF3', 'EGR1', 'EGR2', 'EGR3', 'EHF', 'ELF1', 'ELF3', 'ELF4', 'ELF5', 'ELK1', 'ELK4', 'EOMES', 'ERF', 'ERG', 'ESR1', 'ESR2', 'ESRRA', 'ETS1', 'ETV1', 'ETV4', 'ETV5', 'ETV6', 'FLI1', 'FOS', 'FOSL1', 'FOSL2', 'FOXA1', 'FOXA2', 'FOXA3', 'FOXJ2', 'FOXK1', 'FOXK2', 'FOXO1', 'FOXP1', 'GABPA', 'GATA1', 'GATA2', 'GATA3', 'GATA4', 'GATA6', 'GFI1', 'GFI1B', 'GLIS1', 'GLIS2', 'GLIS3', 'GRHL2', 'HAND2', 'HIC1', 'HIF1A', 'HINFP', 'HLF', 'HMBOX1', 'HNF1A', 'HNF1B', 'HNF4A', 'HNF4G', 'HOXA9', 'HOXB13', 'HSF1', 'HSF2', 'IRF1', 'IRF2', 'IRF3', 'IRF4', 'ISL1', 'JUN', 'JUNB', 'JUND', 'KLF1', 'KLF11', 'KLF12', 'KLF15', 'KLF16', 'KLF4', 'KLF5', 'KLF9', 'LEF1', 'LHX2', 'LHX9', 'MAF', 'MAFB', 'MAFF', 'MAFK', 'MAX', 'MECOM', 'MEF2A', 'MEF2B', 'MEF2C', 'MEF2D', 'MEIS1', 'MEIS2', 'MGA', 'MITF', 'MLX', 'MNT', 'MXI1', 'MYB', 'MYBL2', 'MYC', 'MYCN', 'MYF5', 'MYOD1', 'MYOG', 'NEUROD1', 'NEUROG2', 'NFE2', 'NFE2L2', 'NFIA', 'NFIB', 'NFIC', 'NFIL3', 'NFKB1', 'NFKB2', 'NFYA', 'NFYB', 'NFYC', 'NKX2-5', 'NKX3-1', 'NR1H2', 'NR1H3', 'NR1H4', 'NR2C1', 'NR2C2', 'NR2F1', 'NR2F2', 'NR2F6', 'NR3C1', 'NR4A1', 'NR5A1', 'NR5A2', 'NRF1', 'OCT4', 'ONECUT1', 'ONECUT2', 'OSR2', 'OTX2', 'PAX5', 'PAX6', 'PBX1', 'PBX2', 'PBX3', 'PDX1', 'PHOX2B', 'PKNOX1', 'PLAG1', 'POU2F1', 'POU2F2', 'POU5F1', 'PPARG', 'PRDM1', 'PRDM4', 'RARA', 'RARG', 'RBPJ', 'REL', 'RELA', 'RELB', 'REST', 'RFX1', 'RFX2', 'RFX3', 'RFX5', 'RUNX1', 'RUNX2', 'RUNX3', 'RXRA', 'RXRB', 'SCRT1', 'SCRT2', 'SIX1', 'SIX2', 'SMAD2', 'SMAD3', 'SMAD4', 'SNAI2', 'SOX10', 'SOX13', 'SOX17', 'SOX2', 'SOX4', 'SOX6', 'SOX9', 'SP1', 'SP2', 'SP3', 'SP4', 'SPDEF', 'SPI1', 'SPIB', 'SREBF1', 'SRF', 'STAT1', 'STAT2', 'STAT3', 'STAT4', 'STAT5A', 'STAT5B', 'STAT6', 'T', 'TAL1', 'TBX21', 'TBX5', 'TCF12', 'TCF3', 'TCF4', 'TCF7', 'TCF7L1', 'TCF7L2', 'TEAD1', 'TEAD3', 'TEAD4', 'TFAP2A', 'TFAP2C', 'TFAP4', 'TFDP1', 'TFE3', 'TFEB', 'THAP11', 'THRB', 'TP53', 'TP63', 'TP73', 'TWIST1', 'USF1', 'USF2', 'VDR', 'WT1', 'XBP1', 'YY1', 'YY2', 'ZFX', 'ZNF143', 'ZNF263', 'ZNF740']
+    else:
+        tfbs_lst = args.tfbs_list
+
+    # get csv for all pairs
+    print("\nCalculate Script for each pair...\n")
+    pairs_lst = get_possible_pairs(tfbs_lst)
+    print(f"A file will be created for the following pair(s):\n")
+    [print(pair) for pair in pairs_lst]
+
+    number_pairs = len(pairs_lst)
+    current_pair_number = 0
+    print("----------------------   0 %   ----------------------")
+    for idx, tfbs_pair in enumerate(pairs_lst):
+        print(f"{tfbs_pair}:\n ... Generating csv file ...\n")
+        get_csv_single_pair(data, tfbs_pair)
+        print(f"... File has been created ...\n")
+        
+        # print status.
+        current_pair_number =+ idx
+        print(f"----------------------   {round(((current_pair_number+1)/number_pairs)*100, 2)} %   ----------------------")
+        
+
+
+
+
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
                     prog = 'This Script returns a csv file with all important informations about a given TFBS pair.',
@@ -308,8 +354,8 @@ if __name__ == "__main__":
     # Input and Output of the files:
     parser.add_argument('-f', '--filename', required=True,
             help='give BED file path containing genomic regions of Promotors, the GeneID, all TFBS etc. It has to be in the right format (see Documentation)')
-    parser.add_argument('-tfbs_pair', '--tfbs_pair_list', nargs="*", type=str, required=True,
-            help='give a list, containing two TFBS names, which should be processed as tfbs pair.')
+    parser.add_argument('-tfbs_lst', '--tfbs_list', nargs="*", type=str, required=True, 
+            help='give a list, containing TFBS names. You can specify more than two TFBSs, and the script will be run for each possible pair of TFBSs.')
     parser.add_argument('-out', '--output', required=True,
             help='give output path for csv file')
     
@@ -320,9 +366,20 @@ if __name__ == "__main__":
     parser.add_argument('-chr', '--filter_chromosome', required=False, default="",
             help='Specify chromosome for filtering given BedTool. ') 
     
+    # Apply script on every possible tfbs_pair.
+    parser.add_argument('-return_uniBind', '--return_all_uniBind_tfbs_pairs', action="store_true",
+        help='If -return_all is used, all possible TFBS pairs are calculated from the TFs specified in tfbs_pair. The original script will then be applied to all TFBS pairs. ') 
+
     args = parser.parse_args()
     
-    data = pybedtools.BedTool(args.filename)
-    tfbs_lst = args.tfbs_pair
-    df = get_pair(data, tfbs_lst, filter_by_geneType=args.filter_GeneType, filter_by_chr=args.filter_chromosome)
-    df.to_csv(f"{args.output}/{tfbs_lst[0]}_{tfbs_lst[1]}.csv")
+    
+    data = pybedtools.BedTool("/sybig/projects/GeneRegulation/data/jme/Bachelorarbeit/data/Promotor_with_TFBS/All_GTEx_Prom_with_TFBS.bed")
+
+    df = get_pair(data, ("CTCF", "REST"))
+    print(df)
+
+
+
+
+
+
