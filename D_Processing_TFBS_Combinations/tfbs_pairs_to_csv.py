@@ -12,8 +12,6 @@ chr7,ENSG00000003147.17,CTCF,REST,-10.0,103.0,convergent,73.0,47.0,35.0
 
 Each pair can thus be successfully described.
 
-
-
 """
 
 import pybedtools
@@ -70,6 +68,10 @@ def get_tfbs_subset(BedTool, tfbs_lst):
     Filtering BedTool, so that only Promotors/GeneIDs remain, that contain every TFBS in tfbs_lst at least once.
     """
     return BedTool.filter(func_for_tfbs_subset, tfbs_lst)
+
+
+def 
+
 
 
 def main():
