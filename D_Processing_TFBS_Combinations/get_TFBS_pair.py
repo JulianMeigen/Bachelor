@@ -252,7 +252,9 @@ def get_orientation_and_order_for_pair(df):
 
         # Get Distance between pair. 
         distance_between_pair = pair_df_sorted.iloc[1]["Distance_to_TSS_close"] - pair_df_sorted.iloc[0]["Distance_to_TSS_dist"]
- protein_coding, TFBS_dist, closest_TSS_distance, furthest_TSS_distance, orientation_of_pair, distance_between_pair, tfbs_count, tfbs_count_unique]
+ 
+
+        values_per_col = [chr, geneID, TFBS_close, TFBS_dist, closest_TSS_distance, furthest_TSS_distance, orientation_of_pair, distance_between_pair, tfbs_count, tfbs_count_unique]
         lst_2D = np.vstack((lst_2D, np.array(values_per_col)))
 
     # Generating DataFrame
