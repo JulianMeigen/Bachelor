@@ -144,7 +144,9 @@ def refine_intersect_intervall(interval, prom_len):
 
     return interval
 
-
+def filter_merged_BedTool_for_multpile_GeneIDs(BedTool):
+    new_bed = BedTool.filter(lambda x: len(x.fields[3].split(","))==1)
+    return new_bed
 
 
 
@@ -173,7 +175,10 @@ def main():
         o_for_merge = ["distinct","distinct","distinct", "collapse","collapse","collapse","collapse"]
         merged_BedTool = merge_bed(new_intersect, c_for_merge, o_for_merge)
 
-    merged_BedTool.saveas(f"{args.output}/Prom_with_TFBSs_raw.bed")
+    # Filter merged BedTool for merged Promotor regions
+    filtered_merged_BedTool = filter_merged_BedTool_for_multpile_GeneIDs(merged_BedTool)
+    # Save BedTool in output folder
+    filtered_merged_BedTool.saveas(f"{args.output}/Prom_with_TFBSs.bed")
 
 
 
