@@ -9,7 +9,8 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import pearsonr, spearmanr
-import timebudget
+from timebudget import timebudget
+
 
 
 ###################################    Previous Functions    ###################################
@@ -169,7 +170,7 @@ def get_GeneExpr_for_geneIds(gtex_df, geneIds):
 
 
 
-
+@timebudget
 def main(BedTool, geneexpr, tf_name):
 
     # Filter BedTool for GeneType for "protein_coding" and for specific TFBS
@@ -182,11 +183,11 @@ def main(BedTool, geneexpr, tf_name):
     counts = tfbs_info_2d[:,-1].astype(int)
 
     # Extract Geneexpresson for every GeneId out of geneexpr Dataframe
-    tfbs_gene_expr = get_GeneExpr_for_geneIds(gtex_df, geneIds)
+    tfbs_gene_expr = get_GeneExpr_for_geneIds(geneexpr, geneIds)
 
     # Expand every tfbs count for 54 times and flatten the geneexpression data in order to calculate the correlations between all tissues.
     counts_copy = np.repeat(counts, np.shape(tfbs_gene_expr)[1])
-    tfbs_gene_expr_flatten = tfbs_gene_expr.flatten()
+    tfbs_gene_expr_flatten = tfbs_gene_expr.flatten().astype(float)
 
     # Calculate Spearman correlation
     r, p_value = spearmanr(counts_copy, tfbs_gene_expr_flatten)
@@ -199,5 +200,5 @@ if __name__ == "__main__":
     data = pybedtools.BedTool("/sybig/projects/GeneRegulation/data/jme/Bachelorarbeit/data/Promotor_with_TFBS/New_TFBS_BED/Prom_with_TFBSs.bed")
     gtex_df = pd.read_csv("/sybig/projects/GeneRegulation/data/jme/Bachelorarbeit/data/GTEx_GenExpr_ucsc.csv", sep=",")
 
-
-    main(BedTool=data, geneexpr=gtex_df, tf_name="ESR1")
+    r, p_value = main(BedTool=data, geneexpr=gtex_df, tf_name="ESR1")
+    print(r, p_value)
