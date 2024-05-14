@@ -271,10 +271,17 @@ def main():
         data = filter_bed(data, 10, args.filter_GeneType)
     if len(args.filter_chromosome)>0:
         data = filter_bed(data, 0, args.filter_chromosome)
-
+        
     
-    with Pool(4) as pool:
-        pool.starmap(write_csv_file_for_interval, zip(data, repeat(output_folder)))
+    # Specify Geneeypression Data
+    if len(args.add_GeneExpression_Data) > 0:
+        gtex_df = pd.read_csv(args.add_GeneExpression_Data, sep=",")  
+        with Pool(4) as pool:
+            pool.starmap(write_csv_file_for_interval_with_GeneExpr, zip(data, repeat(output_folder), repeat(gtex_df)))
+
+    else:
+        with Pool(4) as pool:
+            pool.starmap(write_csv_file_for_interval, zip(data, repeat(output_folder)))
 
 
 
@@ -296,6 +303,9 @@ if __name__ == "__main__":
             help='Specify GeneType for filtering given BedTool. ')  
     parser.add_argument('-chr', '--filter_chromosome', required=False, default="",
             help='Specify chromosome for filtering given BedTool. ') 
+    
+    parser.add_argument('-GeneExpr', '--add_GeneExpression_Data', required=False, default="",
+            help='Add file path for an csv file, containing the Geneexpression Data for the GeneIDs (for format specifiactions see Documentation)') 
 
     args = parser.parse_args()
     
