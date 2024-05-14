@@ -152,7 +152,7 @@ def main():
 
     # Specify Geneeypression Data
     if len(args.add_GeneExpression_Data) > 0:
-        gtex_df = pd.read_csv(args.add_GeneExpression_Data, sep=",")  
+        gtex_df = pd.read_csv(args.add_GeneExpression_Data, sep=",")
         with Pool(4) as pool:
             pool.starmap(write_csv_file_for_interval_with_GeneExpr, zip(data, repeat(output_folder), repeat(gtex_df)))
 
