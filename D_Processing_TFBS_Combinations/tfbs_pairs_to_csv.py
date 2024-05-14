@@ -137,6 +137,26 @@ def get_infos_to_pairs(tf_pairs_order, close_pairs_order, dist_pairs_order, ori_
 
 
 def process_prom(BedTool_Interval):
+    
+    """
+    Processing a BedTool Interval and returning information for every tfbs pair in region.
+    
+    
+    Parameters
+    ----------
+    BedTool_Interval : BedTool.Interval
+        Interval of BedTool Object, containing genomic regions of promotor and other informations according to format (see Documentation).
+    gtex_df : pd.DataFrame
+        DataFrame, containing the GeneID (ENSEMBLE) in the first column and the expression per tissue in the other columns.
+
+    Returns
+    -------
+    tf_pairs : np.array
+        2D numpy array, containing the tf_pairs in the genomic region.
+    summarized_array : np.array
+        numpy array, containing strings with important infomration for every tf_pair.
+    
+    """
     chr, geneID, tfbs_arr, tfbs_close_tss_arr, tfbs_dist_tss_arr, tfbs_strand_orientation, tfbs_count, tfbs_unique_count = get_tfbs_arrays_from_BedTool_Interval(BedTool_Interval)
     
     #Check if the region has more then one tfbs to form a pair.
@@ -159,6 +179,71 @@ def process_prom(BedTool_Interval):
     else:
         print(f"The Region {geneID} does only contain {tfbs_arr[0]}.")
         return None
+
+
+#################################### Function to write gtex data into files ####################################
+
+def get_GeneExpr_for_geneId(gtex_df, geneId):
+        
+    red_df = gtex_df[gtex_df.Name == geneId]
+    if len(red_df) > 0 :
+        expr = red_df.to_numpy()[0][1:]
+    else:
+        print(f"For {geneId} was no Expression Data found.")
+        expr = np.empty((1,len(gtex_df.columns)-1))
+        expr[:] = np.nan  
+    return expr
+
+def process_prom_with_Expression(BedTool_Interval, gtex_df):
+    """
+    Processing a BedTool Interval and returning information for every tfbs pair in the region. It also conects the Genexpression to every genomic location.
+
+    Parameters
+    ----------
+    BedTool_Interval : BedTool.Interval
+        Interval of BedTool Object, containing genomic regions of promotor and other informations according to format (see Documentation).
+    gtex_df : pd.DataFrame
+        DataFrame, containing the GeneID (ENSEMBLE) in the first column and the expression per tissue in the other columns.
+
+    Returns
+    -------
+    tf_pairs : np.array
+        2D numpy array, containing the tf_pairs in the genomic region.
+    summarized_array : np.array
+        numpy array, containing strings with important infomration for every tf_pair. It also contains the Genexpression for every tissue.
+
+    """
+    chr, geneID, tfbs_arr, tfbs_close_tss_arr, tfbs_dist_tss_arr, tfbs_strand_orientation, tfbs_count, tfbs_unique_count = get_tfbs_arrays_from_BedTool_Interval(BedTool_Interval)
+    
+    #Check if the region has more then one tfbs to form a pair.
+    if len(tfbs_arr)>1:
+        
+        # Extract Geneexpression from gtex_df and append it to the csv file.
+        GeneExpr = get_GeneExpr_for_geneId(gtex_df, geneID)
+        GeneExpr_str = ",".join([str(i) for i in GeneExpr])
+
+        # Sorting tfbs arrays according to tfbs_name and then to tss distance.
+        sorted_idx = np.lexsort((tfbs_close_tss_arr, tfbs_arr))
+        tf_s, close_s, dist_s, ori_s = tfbs_arr[sorted_idx], tfbs_close_tss_arr[sorted_idx], tfbs_dist_tss_arr[sorted_idx], tfbs_strand_orientation[sorted_idx]
+        # Calculating Pairs of these sorted arrays
+        tf_pairs, close_pairs, dist_pairs, ori_pairs = calculate_pairs(tf_s, close_s, dist_s, ori_s)
+        # Sorting Pairs by tfbs_order
+        tf_pairs_order, close_pairs_order, dist_pairs_order, ori_pairs_order = sort_tfbs_by_order(tf_pairs, close_pairs, dist_pairs, ori_pairs)
+
+        # Get Information about TFBS-pairs
+        close_tfbs, dist_tfbs, closest_dist_to_TSS, furthest_dist_to_TSS, pair_dist, pair_ori = get_infos_to_pairs(tf_pairs_order, close_pairs_order, dist_pairs_order, ori_pairs_order)
+        # Summarize TFBS-Informations as concatenated string
+        summarized_array = np.array([f"{chr},{geneID},{close_tfbs[i]},{dist_tfbs[i]},{closest_dist_to_TSS[i]},{furthest_dist_to_TSS[i]},{pair_dist[i]},{pair_ori[i]},{tfbs_count},{tfbs_unique_count},{GeneExpr_str}\n" for i in range(len(tf_pairs_order))])
+        
+        return tf_pairs, summarized_array
+    else:
+        print(f"The Region {geneID} does only contain {tfbs_arr[0]}.")
+        return None
+    
+def write_csv_file_for_interval_with_GeneExpr(BedTool_Interval, output_folder, gtex_df):
+        if process_prom_with_Expression(BedTool_Interval, gtex_df) is not None:
+            tfbs_arr, summarized_array = process_prom_with_Expression(BedTool_Interval, gtex_df)
+            write_and_append_csv_files(tfbs_arr, summarized_array, output_folder)
 
 
 #################################### Function to write single Interval into csv File ####################################
