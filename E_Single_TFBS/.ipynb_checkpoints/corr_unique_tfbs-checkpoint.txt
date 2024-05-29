@@ -1,0 +1,109 @@
+Pearson_r	p_value
+Adipose - Subcutaneous	0.341509	0.000000e+00
+Adipose - Visceral (Omentum)	0.337352	0.000000e+00
+Adrenal Gland	0.367122	0.000000e+00
+Artery - Aorta	0.335180	0.000000e+00
+Artery - Coronary	0.341240	0.000000e+00
+Artery - Tibial	0.337572	0.000000e+00
+Bladder	0.366989	0.000000e+00
+Brain - Amygdala	0.302369	0.000000e+00
+Brain - Anterior cingulate cortex (BA24)	0.299326	0.000000e+00
+Brain - Caudate (basal ganglia)	0.311082	0.000000e+00
+Brain - Cerebellar Hemisphere	0.322046	0.000000e+00
+Brain - Cerebellum	0.316957	0.000000e+00
+Brain - Cortex	0.301865	0.000000e+00
+Brain - Frontal Cortex (BA9)	0.302570	0.000000e+00
+Brain - Hippocampus	0.310042	0.000000e+00
+Brain - Hypothalamus	0.321670	0.000000e+00
+Brain - Nucleus accumbens (basal ganglia)	0.311869	0.000000e+00
+Brain - Putamen (basal ganglia)	0.301793	0.000000e+00
+Brain - Spinal cord (cervical c-1)	0.335809	0.000000e+00
+Brain - Substantia nigra	0.315754	0.000000e+00
+Breast - Mammary Tissue	0.359393	0.000000e+00
+Cells - Cultured fibroblasts	0.417765	0.000000e+00
+Cells - EBV-transformed lymphocytes	0.378849	0.000000e+00
+Cervix - Ectocervix	0.358232	0.000000e+00
+Cervix - Endocervix	0.366186	0.000000e+00
+Colon - Sigmoid	0.350444	0.000000e+00
+Colon - Transverse	0.360075	0.000000e+00
+Esophagus - Gastroesophageal Junction	0.346926	0.000000e+00
+Esophagus - Mucosa	0.358736	0.000000e+00
+Esophagus - Muscularis	0.346853	0.000000e+00
+Fallopian Tube	0.358676	0.000000e+00
+Heart - Atrial Appendage	0.315387	0.000000e+00
+Heart - Left Ventricle	0.314067	0.000000e+00
+Kidney - Cortex	0.348060	0.000000e+00
+Kidney - Medulla	0.370290	0.000000e+00
+Liver	0.315479	0.000000e+00
+Lung	0.348146	0.000000e+00
+Minor Salivary Gland	0.370083	0.000000e+00
+Muscle - Skeletal	0.318572	0.000000e+00
+Nerve - Tibial	0.345145	0.000000e+00
+Ovary	0.361323	0.000000e+00
+Pancreas	0.350859	0.000000e+00
+Pituitary	0.362689	0.000000e+00
+Prostate	0.364309	0.000000e+00
+Skin - Not Sun Exposed (Suprapubic)	0.353500	0.000000e+00
+Skin - Sun Exposed (Lower leg)	0.349461	0.000000e+00
+Small Intestine - Terminal Ileum	0.361034	0.000000e+00
+Spleen	0.348566	0.000000e+00
+Stomach	0.364785	0.000000e+00
+Testis	0.353083	0.000000e+00
+Thyroid	0.360200	0.000000e+00
+Uterus	0.359484	0.000000e+00
+Vagina	0.354377	0.000000e+00
+Whole Blood	0.284737	6.675752e-282
+Adipose - Subcutaneous	0.341509	0.000000e+00
+Adipose - Visceral (Omentum)	0.337352	0.000000e+00
+Adrenal Gland	0.367122	0.000000e+00
+Artery - Aorta	0.335180	0.000000e+00
+Artery - Coronary	0.341240	0.000000e+00
+Artery - Tibial	0.337572	0.000000e+00
+Bladder	0.366989	0.000000e+00
+Brain - Amygdala	0.302369	0.000000e+00
+Brain - Anterior cingulate cortex (BA24)	0.299326	0.000000e+00
+Brain - Caudate (basal ganglia)	0.311082	0.000000e+00
+Brain - Cerebellar Hemisphere	0.322046	0.000000e+00
+Brain - Cerebellum	0.316957	0.000000e+00
+Brain - Cortex	0.301865	0.000000e+00
+Brain - Frontal Cortex (BA9)	0.302570	0.000000e+00
+Brain - Hippocampus	0.310042	0.000000e+00
+Brain - Hypothalamus	0.321670	0.000000e+00
+Brain - Nucleus accumbens (basal ganglia)	0.311869	0.000000e+00
+Brain - Putamen (basal ganglia)	0.301793	0.000000e+00
+Brain - Spinal cord (cervical c-1)	0.335809	0.000000e+00
+Brain - Substantia nigra	0.315754	0.000000e+00
+Breast - Mammary Tissue	0.359393	0.000000e+00
+Cells - Cultured fibroblasts	0.417765	0.000000e+00
+Cells - EBV-transformed lymphocytes	0.378849	0.000000e+00
+Cervix - Ectocervix	0.358232	0.000000e+00
+Cervix - Endocervix	0.366186	0.000000e+00
+Colon - Sigmoid	0.350444	0.000000e+00
+Colon - Transverse	0.360075	0.000000e+00
+Esophagus - Gastroesophageal Junction	0.346926	0.000000e+00
+Esophagus - Mucosa	0.358736	0.000000e+00
+Esophagus - Muscularis	0.346853	0.000000e+00
+Fallopian Tube	0.358676	0.000000e+00
+Heart - Atrial Appendage	0.315387	0.000000e+00
+Heart - Left Ventricle	0.314067	0.000000e+00
+Kidney - Cortex	0.348060	0.000000e+00
+Kidney - Medulla	0.370290	0.000000e+00
+Liver	0.315479	0.000000e+00
+Lung	0.348146	0.000000e+00
+Minor Salivary Gland	0.370083	0.000000e+00
+Muscle - Skeletal	0.318572	0.000000e+00
+Nerve - Tibial	0.345145	0.000000e+00
+Ovary	0.361323	0.000000e+00
+Pancreas	0.350859	0.000000e+00
+Pituitary	0.362689	0.000000e+00
+Prostate	0.364309	0.000000e+00
+Skin - Not Sun Exposed (Suprapubic)	0.353500	0.000000e+00
+Skin - Sun Exposed (Lower leg)	0.349461	0.000000e+00
+Small Intestine - Terminal Ileum	0.361034	0.000000e+00
+Spleen	0.348566	0.000000e+00
+Stomach	0.364785	0.000000e+00
+Testis	0.353083	0.000000e+00
+Thyroid	0.360200	0.000000e+00
+Uterus	0.359484	0.000000e+00
+Vagina	0.354377	0.000000e+00
+Whole Blood	0.284737	6.675752e-282
